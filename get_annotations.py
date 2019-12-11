@@ -1,29 +1,29 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import argparse
 from collections import defaultdict, namedtuple
-import logging
 import json
+import logging
 import os
 import re
 import requests
+import sys
 import urllib.parse
 import xml.etree.ElementTree as ET
 
 from PIL import Image, ImageDraw
 
-logging.basicConfig(level=logging.INFO)
-
-BASE_URL = 'https://ecpo.existsolutions.com/exist/apps/wap/annotations/'
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 CategoryLabel = namedtuple('CategoryLabel', ['color', 'name', 'label'])
 
 
 LABEL_NAME_TO_RGB = {
-    'article': (255, 0, 0),
-    'image': (0, 255, 0),
-    'additional': (0, 0, 255),
-    'advertisement': (100, 100, 100),
+    'article': (255, 165, 0),
+    'image': (0, 0, 255),
+    'advertisement': (0, 128, 0),
+    'additional': (128, 0, 128),
 }
 
 
@@ -190,7 +190,7 @@ class AnnotationPage:
             yield annotation
 
 
-def get_annotations(publication_top_dir, base_url=BASE_URL):
+def get_annotations(publication_top_dir, base_url):
     page = AnnotationPage(base_url)
     yield from page.get_annotations(publication_top_dir)
     while not page.is_last_page():
@@ -200,27 +200,36 @@ def get_annotations(publication_top_dir, base_url=BASE_URL):
 
 def construct_mask(reference_image_path, annotations,
                    label_name_to_rgb=LABEL_NAME_TO_RGB,
-                   only_label_names=None):
+                   restrict_to_label_names=None):
     width, height = get_image_dimensions(reference_image_path)
     mask = Image.new('RGB', (width, height), color=0)
     draw = ImageDraw.Draw(mask, 'RGB')
     for annotation in annotations:
         for polygon, label in zip(annotation.polygons, annotation.labels):
-            if only_label_names and label.name not in only_label_names:
+            if (restrict_to_label_names
+                    and label.name not in restrict_to_label_names):
                 continue
             draw.polygon(polygon, label_name_to_rgb[label.name])
     return mask
 
 
-def main():
+def main(publication_top_dir, max_annotations, restrict_to_label_names,
+         base_url, out_top_dir=None):
     max_annotations = 5000
-    publication_top_dir = '/media/data/mydata/Arbeit/ALT/HCTS/EXTHDD1/ECPO/Jingbao/images_renamed'
-    out_top_dir = '/media/data/mydata/Arbeit/ALT/HCTS/EXTHDD1/ECPO/Jingbao/masks'
+    publication_top_dir = os.path.abspath(publication_top_dir)
+    if not out_top_dir:
+        out_top_dir = os.path.join(
+            # os.path.normpath is necessary to remove a possible trailing
+            # slash before calling os.path.dirname
+            os.path.dirname(os.path.normpath(publication_top_dir)),
+            'masks'
+        )
 
     image_path_to_annotations = defaultdict(list)
     # This loop assumes that there will be exactly one source for each
     # annotation.
-    for i, annotation in enumerate(get_annotations(publication_top_dir)):
+    annotations = get_annotations(publication_top_dir, base_url)
+    for i, annotation in enumerate(annotations):
         image_path = annotation.image_paths[0]
         logging.info('Found annotation for {}'.format(image_path))
         image_path_to_annotations[image_path].append(annotation)
@@ -228,7 +237,8 @@ def main():
             break
 
     for image_path, annotations in image_path_to_annotations.items():
-        mask = construct_mask(image_path, annotations)
+        mask = construct_mask(image_path, annotations,
+                              restrict_to_label_names=restrict_to_label_names)
         mask_path_wrong_ext = os.path.join(
             out_top_dir,
             os.path.relpath(image_path, publication_top_dir)
@@ -240,5 +250,40 @@ def main():
         mask.save(mask_path, 'PNG')
 
 
+def parse_list(list_as_str, sep=','):
+    return [part.strip() for part in list_as_str.split(sep)]
+
+
+def parse_args():
+    description = ('Download annotations from the ECPO API and store them as '
+                   'mask PNG images.')
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('publication_top_dir',
+                        help='Local directory where all images are stored.'
+                        ' XXX: Currently only the top level directory for one'
+                        ' newspaper is supported. This needs to be changed.')
+    parser.add_argument('--max-annotations', '-m', type=int, default=10000,
+                        help='Maximum single annotations to extract. The'
+                        ' program will exit after that many annotations have'
+                        ' been extracted even if that means that some images'
+                        ' are missing some annotations.')
+    parser.add_argument('--out-top-dir',
+                        help='Where to save the mask images. If not given, it'
+                        ' will save them under the directory masks next to the'
+                        ' publication_top_dir')
+    parser.add_argument('--restrict-to-label-names', '-l',
+                        help='Comma-separated list of label names to extract.'
+                        ' All other labels will be ignored when constructing'
+                        ' the masks. If not given, all labels will be'
+                        ' extracted.')
+    parser.add_argument('--base-url',
+                        default='https://ecpo.existsolutions.com/exist/apps/wap/annotations/',
+                        help='URL of the Annotations API endpoints')
+    args = parser.parse_args()
+    args.restrict_to_label_names = parse_list(args.restrict_to_label_names)
+    return args
+
+
 if __name__ == '__main__':
-    main()
+    ARGS = parse_args()
+    main(**vars(ARGS))
