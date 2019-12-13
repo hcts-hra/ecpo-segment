@@ -64,9 +64,9 @@ sharply bounded smaller annotations that are near to each other
 instead of merging them. Additionally, the bounding box drawing has to
 be adjusted so as not to draw polygons diverging too far from a rectangle.
 
-![Document 1 Gold](exp/additional-detection-1/samples/jb_0002_1919-03-06_0001+0004_gold.jpg)
-![Document 1 Raw](exp/additional-detection-1/samples/jb_0002_1919-03-06_0001+0004_raw.jpg)
-![Document 1 Boxes](exp/additional-detection-1/samples/jb_0002_1919-03-06_0001+0004_boxes.jpg)
-![Document 2 Gold](exp/additional-detection-1/samples/jb_3800_1939-04-26_0001+0004_gold.jpg)
-![Document 2 Raw](exp/additional-detection-1/samples/jb_3800_1939-04-26_0001+0004_raw.jpg)
-![Document 2 Boxes](exp/additional-detection-1/samples/jb_3800_1939-04-26_0001+0004_boxes.jpg)
+![Document 1 Gold](samples/jb_0002_1919-03-06_0001+0004_gold.jpg)
+![Document 1 Raw](samples/jb_0002_1919-03-06_0001+0004_raw.jpg)
+![Document 1 Boxes](samples/jb_0002_1919-03-06_0001+0004_boxes.jpg)
+![Document 2 Gold](samples/jb_3800_1939-04-26_0001+0004_gold.jpg)
+![Document 2 Raw](samples/jb_3800_1939-04-26_0001+0004_raw.jpg)
+![Document 2 Boxes](samples/jb_3800_1939-04-26_0001+0004_boxes.jpg)
