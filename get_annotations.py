@@ -9,6 +9,7 @@ import os
 import re
 import requests
 import sys
+from typing import Optional, Sequence, Tuple
 import urllib.parse
 import xml.etree.ElementTree as ET
 
@@ -19,6 +20,8 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 CategoryLabel = namedtuple('CategoryLabel', ['color', 'name', 'label'])
 
 
+# Mapping from a label name to the RGB color the annotation is going
+# to have in the mask.
 LABEL_NAME_TO_RGB = {
     'article': (255, 165, 0),
     'image': (0, 0, 255),
@@ -27,25 +30,48 @@ LABEL_NAME_TO_RGB = {
 }
 
 
-def get_query_value(url, query_key):
+def get_query_value(url: str, query_key: str,
+                    doubly_encoded: bool = True) -> Optional[str]:
+    """Get a value from a URL’s query string using the key.
+
+    :param url: A URL
+    :param query_key: A key / variable name in the query string
+    :param doubly_encoded: Whether the query string of the URL is
+        doubly URL-encoded. If this is True, the value is URL-decoded
+        before return.
+    :return: The retrieved value or None
+    """
     parse_result = urllib.parse.urlparse(url)
     query_dict = urllib.parse.parse_qs(parse_result.query)
     if query_key in query_dict:
-        # unquote_plus decodes the %2B to +, which unquote does not.
-        # XXX: Unquoting again should not even be necessary, but the
-        # query string seems to have been doubly quoted.
-        return urllib.parse.unquote_plus(query_dict[query_key][0])
+        val = query_dict[query_key][0]
+        if doubly_encoded:
+            # unquote_plus decodes the %2B to +, which unquote does not.
+            val = urllib.parse.unquote_plus(val)
+        return val
     return None
 
 
-def get_image_dimensions(image_path):
-    # Width, height
+def get_image_dimensions(image_path: str) -> Tuple[int, int]:
+    """Read an image from disk and get its width and height.
+
+    :param image_path: Path to an image
+    :return: The image’s width and height as a tuple.
+    """
     return Image.open(image_path).size
 
 
 class Annotation:
+    """Our Python counterpart of the ECPO API’s Annotation item.
 
-    def __init__(self, id, sources, selectors, labels):
+    :param id: The annotation item’s ID
+    :param sources: The annotation item’s targets’ sources
+    :param selectors: The annotation item’s targets’ selectors
+    :param labels: The CategoryLabel objects in the annotation item’s bodies.
+    """
+
+    def __init__(self, id: str, sources: Sequence[str],
+                 selectors: Sequence[str], labels: Sequence[CategoryLabel]):
         lengths = (len(sources), len(selectors), len(labels))
         if not all(le == lengths[0] for le in lengths[1:]):
             raise ValueError(
@@ -53,6 +79,7 @@ class Annotation:
                 ' but their lengths are {}'.format(lengths)
             )
 
+        self.id = id
         self.sources = sources
         self.selectors = selectors
         self.labels = labels
@@ -61,6 +88,8 @@ class Annotation:
         self.get_polygons()
 
     def find_corresponding_images(self, publication_top_dir):
+        """Find images corresponding to sources in publication_top_dir
+        """
         self.image_paths = []
         for source in self.sources:
             remote_path = get_query_value(source, 'IIIF')
@@ -215,7 +244,6 @@ def construct_mask(reference_image_path, annotations,
 
 def main(publication_top_dir, max_annotations, restrict_to_label_names,
          base_url, out_top_dir=None):
-    max_annotations = 5000
     publication_top_dir = os.path.abspath(publication_top_dir)
     if not out_top_dir:
         out_top_dir = os.path.join(
