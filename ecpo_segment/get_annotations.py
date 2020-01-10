@@ -7,12 +7,13 @@ import json
 import logging
 import os
 import re
-import requests
 import sys
-from typing import Optional, Sequence, Tuple
+from typing import (Collection, Generator, Iterable, List, Mapping, Optional,
+                    Sequence, Tuple)
 import urllib.parse
 import xml.etree.ElementTree as ET
 
+import requests
 from PIL import Image, ImageDraw
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -32,7 +33,7 @@ LABEL_NAME_TO_RGB = {
 
 def get_query_value(url: str, query_key: str,
                     doubly_encoded: bool = True) -> Optional[str]:
-    """Get a value from a URL’s query string using the key.
+    """Get a value from a URL’s doubly-encoded query string using the key.
 
     :param url: A URL
     :param query_key: A key / variable name in the query string
@@ -72,6 +73,7 @@ class Annotation:
 
     def __init__(self, id: str, sources: Sequence[str],
                  selectors: Sequence[str], labels: Sequence[CategoryLabel]):
+        """Initialize the Annotation object."""
         lengths = (len(sources), len(selectors), len(labels))
         if not all(le == lengths[0] for le in lengths[1:]):
             raise ValueError(
@@ -87,8 +89,17 @@ class Annotation:
 
         self.get_polygons()
 
-    def find_corresponding_images(self, publication_top_dir):
-        """Find images corresponding to sources in publication_top_dir
+    def find_corresponding_images(self, publication_top_dir: str) -> None:
+        """Find images corresponding to sources in publication_top_dir.
+
+        The method finds the corresponding images by comparing the filenames of
+        the local files with the source URLs. Instead of returning something,
+        this method modifies the `self.image_paths` attribute
+
+        :param publication_top_dir: Local top level directory where the images
+            of the publications for this document type are stored. E.g.
+            ~/ECPO/Jingbao
+
         """
         self.image_paths = []
         for source in self.sources:
@@ -103,6 +114,11 @@ class Annotation:
             self.image_paths.append(local_path)
 
     def get_polygons(self):
+        """Get polygons from the annotation.
+
+        The polygons are constructed from the selector and stored in the
+        `self.polygons` attribute.
+        """
         self.polygons = []
         for selector in self.selectors:
             polygon = []
@@ -152,12 +168,25 @@ class Annotation:
 
 
 class AnnotationPage:
+    """A page listing many annotations and containing a link to the next page.
 
-    def __init__(self, url):
+    A sensible value for initializing this could be
+    https://ecpo.existsolutions.com/exist/apps/wap/annotations/.
+    """
+
+    def __init__(self, url: str) -> None:
+        """Initialize the AnnotationPage and download its content.
+
+        :param url: This annotation listing page’s URL
+        """
         self.url = url
         self.content = self.download_page()
 
-    def download_page(self):
+    def download_page(self) -> dict:
+        """Download the JSON annotation listing from the internet.
+
+        :return: The content parsed into a dict
+        """
         response = requests.get(self.url)
         try:
             content = response.json()
@@ -166,10 +195,15 @@ class AnnotationPage:
                                .format(self.url))
         return content
 
-    def is_last_page(self):
+    def is_last_page(self) -> bool:
+        """Find out if this page is the last annotation page."""
         return self.content['id'] == self.content['last']
 
-    def next_url(self):
+    def next_url(self) -> Optional[str]:
+        """Get the URL of the next page of annotations.
+
+        :return: The URL or None if this is already the last page.
+        """
         if self.content and 'next' in self.content:
             next_url_parsed = urllib.parse.urlparse(self.content['next'])
             # Since the URLs in the response point to localhost:8080 on HTTP,
@@ -186,7 +220,14 @@ class AnnotationPage:
             return actual_next_url_parsed.geturl()
         return None
 
-    def get_annotations(self, publication_top_dir):
+    def get_annotations(self, publication_top_dir: str) -> Generator[Annotation, None, None]:
+        """Get annotations from this page.
+
+        :param publication_top_dir: Local top level directory where the images
+            of the publications for this document type are stored. E.g.
+            ~/ECPO/Jingbao
+        :yield: The annotations, one at a time
+        """
         for item in self.content['items']:
             if len(item['body']) != len(item['target']):
                 logging.warning(
@@ -219,7 +260,16 @@ class AnnotationPage:
             yield annotation
 
 
-def get_annotations(publication_top_dir, base_url):
+def get_annotations(publication_top_dir: str,
+                    base_url: str) -> Generator[Annotation, None, None]:
+    """Download annotations from the ECPO API.
+
+    :param publication_top_dir: Local top level directory where the images of
+        the publications for this document type are stored. E.g. ~/ECPO/Jingbao
+
+    :param base_url: API URL for listing the annotations
+    :yield: The annotations, one at a time
+    """
     page = AnnotationPage(base_url)
     yield from page.get_annotations(publication_top_dir)
     while not page.is_last_page():
@@ -227,10 +277,19 @@ def get_annotations(publication_top_dir, base_url):
         yield from page.get_annotations(publication_top_dir)
 
 
-def construct_mask(reference_image_path, annotations,
-                   label_name_to_rgb=LABEL_NAME_TO_RGB,
-                   restrict_to_label_names=None):
-    width, height = get_image_dimensions(reference_image_path)
+def construct_mask(width: int, height: int, annotations: Iterable[Annotation],
+                   label_name_to_rgb: Mapping[str, Tuple[int, int, int]] = LABEL_NAME_TO_RGB,
+                   restrict_to_label_names: Optional[Collection[str]] = None) -> Image:
+    """Construct a mask image from annotations.
+
+    :param width: Width of the resulting image
+    :param height: Height of the resulting image
+    :param annotations: Annotation objects
+    :param label_name_to_rgb: Mapping from label name to RGB tuple
+    :param restrict_to_label_names: Names of the labels that are rendered in
+        the mask. If None (the default), all labels are rendered.
+    :return: Constructed mask
+    """
     mask = Image.new('RGB', (width, height), color=0)
     draw = ImageDraw.Draw(mask, 'RGB')
     for annotation in annotations:
@@ -244,15 +303,18 @@ def construct_mask(reference_image_path, annotations,
 
 def main(publication_top_dir, max_annotations, restrict_to_label_names,
          base_url, out_top_dir=None):
+    """Download annotations from the ECPO API and save them as mask images."""
     publication_top_dir = os.path.abspath(publication_top_dir)
     if not out_top_dir:
         out_top_dir = os.path.join(
-            # os.path.normpath is necessary to remove a possible trailing
-            # slash before calling os.path.dirname
+            # os.path.normpath is necessary to remove a potential trailing slash
+            # before calling os.path.dirname, because in Python
+            # dirname('/usr/') is '/usr'
             os.path.dirname(os.path.normpath(publication_top_dir)),
             'masks'
         )
 
+    # Download the annotations.
     image_path_to_annotations = defaultdict(list)
     # This loop assumes that there will be exactly one source for each
     # annotation.
@@ -264,8 +326,10 @@ def main(publication_top_dir, max_annotations, restrict_to_label_names,
         if i == max_annotations:
             break
 
+    # Construct annotation masks and save them as PNG images.
     for image_path, annotations in image_path_to_annotations.items():
-        mask = construct_mask(image_path, annotations,
+        width, height = get_image_dimensions(image_path)
+        mask = construct_mask(width, height, annotations,
                               restrict_to_label_names=restrict_to_label_names)
         mask_path_wrong_ext = os.path.join(
             out_top_dir,
@@ -278,14 +342,17 @@ def main(publication_top_dir, max_annotations, restrict_to_label_names,
         mask.save(mask_path, 'PNG')
 
 
-def parse_list(list_as_str, sep=','):
+def parse_list(list_as_str: str, sep: str = ',') -> List[str]:
+    """Parse sep-separated string of components into a list.
+
+    Splits the list at a separator string (, (comma) by default) and returns
+    the resulting parts after stripping whitespace.
+    """
     return [part.strip() for part in list_as_str.split(sep)]
 
 
 def parse_args():
-    description = ('Download annotations from the ECPO API and store them as '
-                   'mask PNG images.')
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(description=main.__doc__)
     parser.add_argument('publication_top_dir',
                         help='Local directory where all images are stored.'
                         ' XXX: Currently only the top level directory for one'

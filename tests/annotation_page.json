@@ -1,0 +1,249 @@
+{
+   "@context" : "http://www.w3.org/ns/anno.jsonld",
+   "id" : "http://localhost:8080/exist/apps/wap/annotations/?page=0",
+   "items" : [
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "orange",
+                  "label" : "Article",
+                  "name" : "article"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:46:27.733Z",
+         "id" : "s-1561481187733",
+         "target" : [
+            {
+               "id" : "s-15614811877309",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 2006.2464 1932.89664)\"><polygon points=\"-52.52384,108.86496 52.52384,108.86496 52.52384,-108.86496 -52.52384,-108.86496 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "blue",
+                  "label" : "Image or Drawing",
+                  "name" : "image"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:41:53.353Z",
+         "id" : "s-1561480913353",
+         "target" : [
+            {
+               "id" : "s-15614809133477",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 2298.824 2920.944)\"><polygon points=\"-173.80704,89.19872 173.80704,89.19872 173.80704,-89.19872 -173.80704,-89.19872 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "green",
+                  "label" : "Advertisement",
+                  "name" : "advertisement"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:40:20.493Z",
+         "id" : "s-1561480820493",
+         "target" : [
+            {
+               "id" : "s-15614808204873",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 4024.5728 2568.15968)\"><polygon points=\"-202.50912,-510.45248 202.50912,-510.45248 202.50912,510.45248 -202.50912,510.45248 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "green",
+                  "label" : "Advertisement",
+                  "name" : "advertisement"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:40:26.822Z",
+         "id" : "s-1561480826822",
+         "target" : [
+            {
+               "id" : "s-15614808268153",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 3548.1376 2571.63872)\"><polygon points=\"-244.83744,-519.44 244.83744,-519.44 244.83744,519.44 -244.83744,519.44 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "green",
+                  "label" : "Advertisement",
+                  "name" : "advertisement"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:40:32.958Z",
+         "id" : "s-1561480832958",
+         "target" : [
+            {
+               "id" : "s-156148083295110",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 2919.05952 2572.99168)\"><polygon points=\"-346.79264,-518.08704 346.79264,-518.08704 346.79264,518.08704 -346.79264,518.08704 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "orange",
+                  "label" : "Article",
+                  "name" : "article"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:46:14.524Z",
+         "id" : "s-1561481174524",
+         "target" : [
+            {
+               "id" : "s-15614811745203",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 684.35616 1938.30848)\"><polygon points=\"-307.3152,-531.23008 307.3152,-531.23008 307.3152,531.23008 -307.3152,531.23008 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "green",
+                  "label" : "Advertisement",
+                  "name" : "advertisement"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:40:49.594Z",
+         "id" : "s-1561480849594",
+         "target" : [
+            {
+               "id" : "s-15614808495876",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 2298.824 831.29728)\"><polygon points=\"-222.07872,-285.76448 222.07872,-285.76448 222.07872,285.76448 -222.07872,285.76448 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "orange",
+                  "label" : "Article",
+                  "name" : "article"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:36:40.189Z",
+         "id" : "s-1561480600189",
+         "target" : [
+            {
+               "id" : "s-156148060018410",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 4138.02816 1292.36672)\"><polygon points=\"-115.19488,108.81664 115.19488,108.81664 115.19488,-108.81664 -115.19488,-108.81664 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      },
+      {
+         "body" : [
+            {
+               "type" : "CategoryLabel",
+               "value" : {
+                  "color" : "blue",
+                  "label" : "Image or Drawing",
+                  "name" : "image"
+               }
+            }
+         ],
+         "created" : "2019-06-25T16:42:17.133Z",
+         "id" : "s-1561480937133",
+         "target" : [
+            {
+               "id" : "s-15614809371280",
+               "selector" : {
+                  "type" : "SvgSelector",
+                  "value" : "<g transform=\"matrix(1 0 0 1 624.68096 2800.48224)\"><polygon points=\"-249.0896,-309.34464 249.0896,-309.34464 249.0896,309.34464 -249.0896,309.34464 \"/></g>"
+               },
+               "source" : "https://kjc-sv002.kjc.uni-heidelberg.de:8080/fcgi-bin/iipsrv.fcgi?IIIF=imageStorage/ecpo_new/jingbao/1939/04/jb_3804_1939-04-30_0005%252B0008.tif/full/full/0/default.jpg",
+               "type" : "SpecificResource"
+            }
+         ],
+         "type" : "Annotation"
+      }
+   ],
+   "last" : "http://localhost:8080/exist/apps/wap/annotations/?page=5106",
+   "next" : "http://localhost:8080/exist/apps/wap/annotations/?page=1",
+   "partOf" : {
+      "id" : "http://localhost:8080/exist/apps/wap/annotations/",
+      "modified" : "2020-01-10T14:54:41.763+01:00",
+      "total" : 51069
+   },
+   "startIndex" : 0,
+   "type" : "AnnotationPage"
+}

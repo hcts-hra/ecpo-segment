@@ -1,10 +1,17 @@
 # ECPO Segmentation
 
-## Requirements
+## Installation
 
-All this code requires Python 3.5 or newer and the packages listed in
-`requirements.txt`. You can install them via `pip install -r
-requirements.txt`.
+First, make sure that you have Python 3.5 or newer. Then install `dhSegment` by
+following their [installation
+procedure](https://github.com/dhlab-epfl/dhSegment)
+
+Then install `ecpo_segment` by executing `pip install .` in this repository’s
+root.
+
+## Running Tests
+
+The tests can be run via `pytest tests` or `python setup.py pytest`.
 
 ## Getting Annotations from ECPO API
 
