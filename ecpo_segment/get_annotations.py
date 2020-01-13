@@ -431,15 +431,16 @@ def parse_args():
                         ' and link_image_dir will be nested like the'
                         ' publication_top_dir if this flag is set. If it is'
                         ' not set, these directories will be flat.')
-    parser.add_argument('--link-image-dir', 'Link the images for which'
+    parser.add_argument('--link-image-dir', help='Link the images for which'
                         ' annotations were found into this this directory.')
-    parser.add_argument('--copy-image-dir', 'Copy the images for which'
+    parser.add_argument('--copy-image-dir', help='Copy the images for which'
                         ' annotations were found into this this directory.')
     parser.add_argument('--base-url',
                         default='https://ecpo.existsolutions.com/exist/apps/wap/annotations/',
                         help='URL of the Annotations API endpoints')
     args = parser.parse_args()
-    args.restrict_to_label_names = parse_list(args.restrict_to_label_names)
+    if args.restrict_to_label_names:
+        args.restrict_to_label_names = parse_list(args.restrict_to_label_names)
     return args
 
 
