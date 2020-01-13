@@ -11,7 +11,7 @@ import responses
 
 from ecpo_segment.get_annotations import (
     Annotation, AnnotationPage, CategoryLabel, construct_mask, get_query_value,
-    parse_list
+    make_dir_structure, parse_list
 )
 
 
@@ -133,6 +133,73 @@ def test_get_query_value():
 
     non_existent = 'foobar'
     get_query_value(non_existent, 'foo') is None
+
+
+@pytest.fixture
+def abc_topdir(tmp_path):
+    a = tmp_path / 'a'
+    b = tmp_path / 'b'
+    c = tmp_path / 'c'
+    for dir_ in (a, b, c):
+        dir_.mkdir()
+        for n in range(1, 4):
+            f = dir_ / '{}.txt'.format(n)
+            f.write_text(str(n))
+    return tmp_path
+
+
+def test_make_directory_structure_nested(abc_topdir):
+    paths = [
+        str(abc_topdir / 'a' / '1.txt'),
+        str(abc_topdir / 'a' / '2.txt'),
+        str(abc_topdir / 'a' / '3.txt'),
+        str(abc_topdir / 'c' / '1.txt'),
+        str(abc_topdir / 'c' / '2.txt'),
+    ]
+    link_dir = abc_topdir / 'links'
+    make_dir_structure(paths,
+                       link_dir=link_dir,
+                       flatten=False,
+                       ref_src_dir=str(abc_topdir))
+
+    for p in paths:
+        relpath = os.path.relpath(p, start=abc_topdir)
+        f = link_dir / relpath
+        assert f.is_symlink()
+        assert str(f.resolve().absolute()) == p
+    assert not (link_dir / 'c' / '3.txt').exists()
+    assert not (link_dir / 'b' / '1.txt').exists()
+
+
+def test_make_directory_structure_flat(abc_topdir):
+    paths = [
+        str(abc_topdir / 'a' / '1.txt'),
+        str(abc_topdir / 'b' / '2.txt'),
+        str(abc_topdir / 'c' / '3.txt'),
+    ]
+    copy_dir = abc_topdir / 'copies'
+    make_dir_structure(paths,
+                       copy_dir=copy_dir,
+                       flatten=True)
+
+    for n in range(1, 4):
+        f = copy_dir / '{}.txt'.format(n)
+        assert f.read_text() == str(n)
+        assert not f.is_symlink()
+    assert not (copy_dir / 'a' / '1.txt').exists()
+    assert not (copy_dir / 'b' / '2.txt').exists()
+    assert not (copy_dir / 'c' / '3.txt').exists()
+
+
+def test_make_directory_structure_no_dst():
+    with pytest.raises(ValueError):
+        make_dir_structure('paths irrelevant')
+
+
+def test_make_directory_structure_no_ref_src_dir():
+    with pytest.raises(ValueError):
+        make_dir_structure('paths irrelevant', link_dir='irrelevant',
+                           flatten=False)
 
 
 def test_parse_list():
