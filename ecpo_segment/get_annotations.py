@@ -374,14 +374,14 @@ def main(publication_top_dir, max_annotations, restrict_to_label_names,
         width, height = get_image_dimensions(image_path)
         mask = construct_mask(width, height, annotations,
                               restrict_to_label_names=restrict_to_label_names)
-        if flat_dirs:
-            mask_path_wrong_ext = os.path.join(mask_dir,
-                                               os.path.basename(image_path))
-        else:
+        if nested_dirs:
             mask_path_wrong_ext = os.path.join(
                 mask_dir,
                 os.path.relpath(image_path, publication_top_dir)
             )
+        else:
+            mask_path_wrong_ext = os.path.join(mask_dir,
+                                               os.path.basename(image_path))
         mask_path_base, _ = os.path.splitext(mask_path_wrong_ext)
         mask_path = mask_path_base + '.png'
         logging.info('Saving mask to {}'.format(mask_path))
@@ -390,10 +390,10 @@ def main(publication_top_dir, max_annotations, restrict_to_label_names,
 
     make_dir_structure(
         paths=image_path_to_annotations.keys(),
-        src_dir=publication_top_dir,
         link_dir=link_image_dir,
         copy_dir=copy_image_dir,
-        flatten=not nested_dirs
+        flatten=not nested_dirs,
+        ref_src_dir=publication_top_dir,
     )
 
 
