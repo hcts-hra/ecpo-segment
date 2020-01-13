@@ -12,7 +12,7 @@ setup(
     license="MIT",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
-        "dhSegment"
+        "dh_segment",
         "numpy",
         "Pillow",
         "requests",
@@ -26,5 +26,4 @@ setup(
     setup_requires=[
         "pytest-runner"
     ],
-    extras_require=extras_require,
 )
