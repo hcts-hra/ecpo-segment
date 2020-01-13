@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import sys
 from typing import (Collection, Generator, Iterable, List, Mapping, Optional,
                     Sequence, Tuple)
@@ -301,12 +302,54 @@ def construct_mask(width: int, height: int, annotations: Iterable[Annotation],
     return mask
 
 
+def make_dir_structure(paths, link_dir=None, copy_dir=None, flatten=True,
+                       ref_src_dir=None):
+    if not (link_dir or copy_dir):
+        raise ValueError('Either link_dir or copy_dir must be specified')
+
+    if not flatten:
+        if not ref_src_dir:
+            raise ValueError(
+                'If flatten is False, you must specify a ref_src_dir to use as'
+                ' the hierarchy’s top dir'
+            )
+
+    for path in paths:
+        src = os.path.abspath(path)
+        if copy_dir:
+            os.makedirs(copy_dir, exist_ok=True)
+            if flatten:
+                dst = os.path.join(copy_dir,
+                                    os.path.basename(path))
+            else:
+                dst = os.path.join(
+                    copy_dir,
+                    os.path.relpath(path, ref_src_dir)
+                )
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy(src, dst)
+
+        if link_dir:
+            os.makedirs(link_dir, exist_ok=True)
+            if flatten:
+                dst = os.path.join(link_dir,
+                                    os.path.basename(path))
+            else:
+                dst = os.path.join(
+                    link_dir,
+                    os.path.relpath(path, ref_src_dir)
+                )
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+            os.symlink(src, dst)
+
+
 def main(publication_top_dir, max_annotations, restrict_to_label_names,
-         base_url, out_top_dir=None):
+         base_url, nested_dirs=False, mask_dir=None, copy_image_dir=None,
+         link_image_dir=None):
     """Download annotations from the ECPO API and save them as mask images."""
     publication_top_dir = os.path.abspath(publication_top_dir)
-    if not out_top_dir:
-        out_top_dir = os.path.join(
+    if not mask_dir:
+        mask_dir = os.path.join(
             # os.path.normpath is necessary to remove a potential trailing slash
             # before calling os.path.dirname, because in Python
             # dirname('/usr/') is '/usr'
@@ -331,15 +374,27 @@ def main(publication_top_dir, max_annotations, restrict_to_label_names,
         width, height = get_image_dimensions(image_path)
         mask = construct_mask(width, height, annotations,
                               restrict_to_label_names=restrict_to_label_names)
-        mask_path_wrong_ext = os.path.join(
-            out_top_dir,
-            os.path.relpath(image_path, publication_top_dir)
-        )
+        if nested_dirs:
+            mask_path_wrong_ext = os.path.join(
+                mask_dir,
+                os.path.relpath(image_path, publication_top_dir)
+            )
+        else:
+            mask_path_wrong_ext = os.path.join(mask_dir,
+                                               os.path.basename(image_path))
         mask_path_base, _ = os.path.splitext(mask_path_wrong_ext)
         mask_path = mask_path_base + '.png'
         logging.info('Saving mask to {}'.format(mask_path))
         os.makedirs(os.path.dirname(mask_path), exist_ok=True)
         mask.save(mask_path, 'PNG')
+
+    make_dir_structure(
+        paths=image_path_to_annotations.keys(),
+        link_dir=link_image_dir,
+        copy_dir=copy_image_dir,
+        flatten=not nested_dirs,
+        ref_src_dir=publication_top_dir,
+    )
 
 
 def parse_list(list_as_str: str, sep: str = ',') -> List[str]:
@@ -362,7 +417,7 @@ def parse_args():
                         ' program will exit after that many annotations have'
                         ' been extracted even if that means that some images'
                         ' are missing some annotations.')
-    parser.add_argument('--out-top-dir',
+    parser.add_argument('--mask-dir',
                         help='Where to save the mask images. If not given, it'
                         ' will save them under the directory masks next to the'
                         ' publication_top_dir')
@@ -371,11 +426,21 @@ def parse_args():
                         ' All other labels will be ignored when constructing'
                         ' the masks. If not given, all labels will be'
                         ' extracted.')
+    parser.add_argument('--nested-dirs', default=False, action='store_true',
+                        help='The mask output directory and the copy_image_dir'
+                        ' and link_image_dir will be nested like the'
+                        ' publication_top_dir if this flag is set. If it is'
+                        ' not set, these directories will be flat.')
+    parser.add_argument('--link-image-dir', help='Link the images for which'
+                        ' annotations were found into this this directory.')
+    parser.add_argument('--copy-image-dir', help='Copy the images for which'
+                        ' annotations were found into this this directory.')
     parser.add_argument('--base-url',
                         default='https://ecpo.existsolutions.com/exist/apps/wap/annotations/',
                         help='URL of the Annotations API endpoints')
     args = parser.parse_args()
-    args.restrict_to_label_names = parse_list(args.restrict_to_label_names)
+    if args.restrict_to_label_names:
+        args.restrict_to_label_names = parse_list(args.restrict_to_label_names)
     return args
 
 
