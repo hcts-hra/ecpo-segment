@@ -4,6 +4,10 @@ This experiment tests multi-class classification with all four labels (article,
 advertisement, additional, image). All commands below are supposed to be
 executed from the directory this report resides in.
 
+The experiments were performed with ecpo_segment at commit
+a29f043358f261a6687fb1ba9dfc9d41f89976f2 and dhSegment at commit
+823b6b45d8b93c786d1c29d567e58e0d9d5db266.
+
 ## Getting Annotation Masks
 
 Downloading annotations into `annotations/masks/` and linking the corresponding images into `annotations/images/`.
