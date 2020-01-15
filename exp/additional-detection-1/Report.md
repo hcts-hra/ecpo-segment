@@ -39,7 +39,7 @@ python3 train.py with demo/demo_config.json
 After this step, there is a directory called `demo/page_model/export`
 which holds the trained model.
 
-## Evaluation
+## Qualitative Evaluation
 
 The script `extract_annotations.py` was then used to run the model on
 the 15 images in the test set. It runs the dhSegment neural net,
@@ -70,3 +70,11 @@ be adjusted so as not to draw polygons diverging too far from a rectangle.
 ![Document 2 Gold](samples/jb_3800_1939-04-26_0001+0004_gold.jpg)
 ![Document 2 Raw](samples/jb_3800_1939-04-26_0001+0004_raw.jpg)
 ![Document 2 Boxes](samples/jb_3800_1939-04-26_0001+0004_boxes.jpg)
+
+
+## Quantitative Evaluation
+
+Mean IoU for class 0 (not-additional): 0.983
+Mean IoU for class 1 (additional): 0.623
+
+Mean of means: 0.803
