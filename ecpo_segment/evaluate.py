@@ -88,12 +88,17 @@ def main(predicted_masks_dir, reference_masks_dir, classes_file):
     ious_per_class = {class_: [] for _, class_ in color_dict.items()}
     for pred_mask, ref_mask in class_masks:
         for class_, ious in ious_per_class.items():
-            ious.append(iou_for_class(pred_mask, ref_mask, class_))
+            iou = iou_for_class(pred_mask, ref_mask, class_)
+            if not np.isnan(iou):
+                ious.append(iou)
 
-    mean_iou_per_class = {class_: np.mean(ious)
+    mean_iou_per_class = {class_: np.mean(ious) if len(ious) > 1 else None
                           for class_, ious in ious_per_class.items()}
     for class_, iou in mean_iou_per_class.items():
         print('Mean IoU for class {}: {:.3f}'.format(class_, iou))
+
+    total_mean_iou = np.mean(list(mean_iou_per_class.values()))
+    print('\nMean of means: {:.3f}'.format(total_mean_iou))
 
 
 def parse_args():
