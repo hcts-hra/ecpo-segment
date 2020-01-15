@@ -60,8 +60,8 @@ Result:
 | Image         | 0.334 |
 | Advertisement | 0.811 |
 | Additional    | 0.740 |
-| ------------- | ----- |
-| Mean          | 0.677 |
+
+Mean of the IoUs: 0.677
 
 ## Qualitative Evaluation
 
@@ -73,10 +73,10 @@ second is the prediction.
 
 ![Simple Layout 1 Gold](samples/labels/jb_0224_1921-01-15_0002+0003.png)
 ![Simple Layout 1 Prediction](samples/predictions/jb_0224_1921-01-15_0002+0003.jpg)
-![Simple Layout 2 Gold](samples/labels/samples/labels/jb_0236_1921-02-27_0002+0003.png)
+![Simple Layout 2 Gold](samples/labels/jb_0236_1921-02-27_0002+0003.png)
 ![Simple Layout 2 Prediction](samples/predictions/jb_0236_1921-02-27_0002+0003.jpg)
 
-### Difficulty on Clearly Separated Mixed Layouts
+### Good Performance on Clearly Separated Mixed Layouts
 
 ![Mixed 1 Layout Gold](samples/labels/jb_3797_1939-04-23_0002+0003.png)
 ![Mixed 1 Layout Prediction](samples/predictions/jb_3797_1939-04-23_0002+0003.jpg)
