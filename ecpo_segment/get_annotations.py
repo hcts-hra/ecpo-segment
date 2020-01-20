@@ -1,6 +1,46 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# XXX, FIXME
+# This program has a couple of issues that should be addressed in further
+# development of the project:
+#
+# 1. One-periodical-only assumption
+#
+# How it is: Especially in the function `find_corresponding_images`, it is
+# assumed that all annotations in the API correspond to the same periodical
+# (e.g. Jingbao) and the user is assumed to give the path to the corresponding
+# local directory in his commandline arguments.
+#
+# How it should be: The user should only point to the top-level ECPO directory
+# containing images of all periodicals and the correct image should be found
+# from the information given in the JSON annotation object.
+#
+# 2. Downloading of all annotations across folds
+#
+# How it is: The program just downloads all annotations it can find on the
+# /annotations/ endpoint. This is problematic (1) because the user cannot make
+# more fine-grained queries and (2) because it means holding a lot of
+# annotations in RAM at the same time until all annotations for a given fold
+# are found, eventually leading to an out-of-memory situation for very large
+# amounts of available annotations.
+#
+# How it should be: The user should be able to specify for which periodical
+# they want to retrieve annotations (cf. problem 1). Even more importantly, the
+# program should use fold-specific endpoints to download all annotations for
+# one fold at a time and then saving them to disk instead of downloading
+# everything into memory and saving everything to disk in the end.
+#
+# 3. Assumption of local presence of images
+#
+# How it is: It is assumed that the user has a local copy of the images for all
+# folds for which they want to retrieve annotations.
+#
+# How it should be: The user should be able to specify that they want to
+# download the source images along with their annotations. This shouldn’t be
+# the default because it will considerably increase download time and load on
+# the server.
+
 import argparse
 from collections import defaultdict, namedtuple
 import json
