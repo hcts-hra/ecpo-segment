@@ -13,6 +13,11 @@ Furthermore, fine-tuning the dhSegment model on ECPO images requires you to have
 the ECPO images stored in your local filesystem and to have HTTP access to the
 ECPO API storing the segmentation annotations.
 
+The trained models in the `exp` directory are quite large and are therefore
+tracked via Git LFS, so you will need to install
+[git-lfs](https://github.com/git-lfs/git-lfs), preferably through your package
+manager (e.g. `apt install git-lfs`).
+
 ## Installation
 
 First, make sure that you have Python 3.5 or newer. Then install `dhSegment` by
