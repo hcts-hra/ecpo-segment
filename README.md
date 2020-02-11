@@ -20,7 +20,7 @@ manager (e.g. `apt install git-lfs`).
 
 ## Installation
 
-First, make sure that you have Python 3.5 or newer. Then install `dhSegment` by
+First, make sure that you have Python 3.6 or newer. Then install `dhSegment` by
 following their [installation
 procedure](https://dhsegment.readthedocs.io/en/latest/start/install.html)
 
